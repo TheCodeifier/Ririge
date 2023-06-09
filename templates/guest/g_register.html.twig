@@ -1,0 +1,35 @@
+{# Code by Riza Incedal  - Development date: 08-06-2023 #}
+
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1 class= "heading2 position-relative">Register</h1>
+
+<div class=" container3 container position-relative">
+   <form type= "POST">
+        {{ form_start(form) }}
+        {{ form_label(form.loginname, 'Gebruikersnaam') }}
+        {{ form_widget(form.loginname) }}
+        {{ form_label(form.password, 'Wachtwoord') }}
+        {{ form_widget(form.password) }}
+        {{ form_label(form.first_name, 'Voornaam') }}
+        {{ form_widget(form.first_name) }}
+        {{ form_label(form.last_name, 'Achternaam') }}
+        {{ form_widget(form.last_name) }}
+        {{ form_label(form.date_of_birth, 'Geboortedatum') }}
+        {{ form_widget(form.date_of_birth) }}
+        {{ form_label(form.street, 'Straat en huisnummer') }}
+        {{ form_widget(form.street) }}
+        {{ form_label(form.place, 'Woonplaats') }}
+        {{ form_widget(form.place) }}
+        {{ form_widget(form.submit, {'label_attr': {'class': 'subButton position-relative'}}) }}
+        {{ form_end(form) }}
+    </form>
+</div>
+
+{% endblock %}
+
+
+
+

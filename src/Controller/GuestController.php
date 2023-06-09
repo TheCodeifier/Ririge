@@ -1,74 +1,104 @@
 <?php
 namespace App\Controller;
+use App\Entity\Person;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Form\MemberRegistrationFormType;
 
-class GuestController extends AbstractController {
+class GuestController extends AbstractController
+{
 
-    public function index(): Response {
+    public function index(): Response
+    {
         return $this->render('guest/index.html.twig', [
             'controller_name' => 'GuestController',
         ]);
     }
 
-    #[Route('/Training_Factory/Account', name: 'Account')]
-    public function account(): Response {
+    #[Route('/', name: 'Home')]
+    public function home(): Response
+    {
 
-        return $this->render('guest/Guest_Account.html.twig');
+        return $this->render('guest/g_home.html.twig');
     }
 
-    #[Route('/Training_Factory/About_Us', name: 'About_Us')]
-    public function aboutus(): Response {
+    #[Route('guest/account', name: 'Account')]
+    public function account(): Response
+    {
 
-        return $this->render('guest/Guest_About_Us.html.twig');
+        return $this->render('guest/g_account.html.twig');
     }
 
-    #[Route('/Training_Factory/Contact', name: 'Contact')]
-    public function contact(): Response {
+    #[Route('guest/about_Us', name: 'About_Us')]
+    public function aboutus(): Response
+    {
 
-        return $this->render('guest/Guest_Contact.html.twig');
+        return $this->render('guest/g_aboutus.html.twig');
     }
 
-    #[Route('/Training_Factory/Home', name: 'Home')]
-    public function home(): Response {
+    #[Route('/contact', name: 'Contact')]
+    public function contact(): Response
+    {
 
-        return $this->render('guest/Guest_Home.html.twig');
+        return $this->render('g_contact.html.twig');
     }
 
-    #[Route('/Training_Factory/Instructor', name: 'Instructor')]
-    public function instructor(): Response {
+
+    #[Route('/Instructor', name: 'Instructor')]
+    public function instructor(): Response
+    {
 
         return $this->render('guest/Guest_Instructor.html.twig');
     }
 
-    #[Route('/Training_Factory/Lesson', name: 'Lesson')]
-    public function lesson(): Response {
+    #[Route('lesson', name: 'Lesson')]
+    public function lesson(): Response
+    {
 
-        return $this->render('guest/Guest_Lesson.html.twig');
+        return $this->render('guest/g_lesson.html.twig');
     }
 
-    #[Route('/Training_Factory/Lessons', name: 'Lessons')]
-    public function lessons(): Response {
+    #[Route('/lessons', name: 'Lessons')]
+    public function lessons(): Response
+    {
 
-        return $this->render('guest/Guest_Lessons.html.twig');
+        return $this->render('guest/g_lessons.html.twig');
     }
 
-    #[Route('/Training_Factory/Login', name: 'Login')]
-    public function login(): Response {
+    #[Route('/Register', name: 'Register')]
+    public function register(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher): Response {
 
-        return $this->render('guest/Guest_Login.html.twig');
+        $person = new Person();
+
+        $regForm = $this->createForm(MemberRegistrationFormType::class, $person);
+        $regForm->handleRequest($request);
+
+        if ($regForm->isSubmitted() && $regForm->isValid()) {
+            $person->setPassword($userPasswordHasher->hashPassword($person, $regForm->get('plainPassword')->getData()));
+            $entityManager->persist($regForm);
+            $entityManager->flush();
+            return $this->redirectToRoute('Account');
+        }
+
+        return $this->render('guest/g_register.html.twig', ['form' => $regForm]);
     }
 
-    #[Route('/Training_Factory/Member', name: 'Member')]
-    public function member(): Response {
+    #[Route('/Login', name: 'Login')]
+    public function login(): Response
+    {
 
-        return $this->render('guest/Guest_Member.html.twig');
+        return $this->render('guest/g_login.html.twig');
     }
 
-    #[Route('/Training_Factory/Register', name: 'Register')]
-    public function register(): Response {
+    #[Route('/Member', name: 'Member')]
+    public function member(): Response
+    {
 
-        return $this->render('guest/Guest_Register.html.twig');
+        return $this->render('guest/member.html.twig');
     }
 }
+

@@ -1,0 +1,15 @@
+body {
+    animation: transitionIn 0.5s;
+}
+
+@keyframes transitionIn {
+    from {
+        opacity: 0;
+        transform: rotatex(-10deg);
+    }
+
+    to {
+        opacity: 1;
+        transform: rotatex(0deg);
+    }
+}
