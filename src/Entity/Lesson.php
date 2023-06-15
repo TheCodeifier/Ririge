@@ -28,16 +28,23 @@ class Lesson
     #[ORM\Column]
     private ?int $max_persons = null;
 
-    #[ORM\OneToMany(mappedBy: 'lesson', targetEntity: PersonLesson::class)]
-    private Collection $personLessons;
+
 
     #[ORM\ManyToOne(inversedBy: 'lessons')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Training $training = null;
 
+    #[ORM\ManyToOne(inversedBy: 'lessons')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Person $instructor = null;
+
+    #[ORM\OneToMany(mappedBy: 'lesson', targetEntity: Registration::class)]
+    private Collection $registrations;
+
     public function __construct()
     {
         $this->personLessons = new ArrayCollection();
+        $this->registrations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,35 +100,7 @@ class Lesson
         return $this;
     }
 
-    /**
-     * @return Collection<int, PersonLesson>
-     */
-    public function getPersonLessons(): Collection
-    {
-        return $this->personLessons;
-    }
 
-    public function addPersonLesson(PersonLesson $personLesson): self
-    {
-        if (!$this->personLessons->contains($personLesson)) {
-            $this->personLessons->add($personLesson);
-            $personLesson->setLesson($this);
-        }
-
-        return $this;
-    }
-
-    public function removePersonLesson(PersonLesson $personLesson): self
-    {
-        if ($this->personLessons->removeElement($personLesson)) {
-            // set the owning side to null (unless already changed)
-            if ($personLesson->getLesson() === $this) {
-                $personLesson->setLesson(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getTraining(): ?Training
     {
@@ -131,6 +110,56 @@ class Lesson
     public function setTraining(?Training $training): self
     {
         $this->training = $training;
+
+        return $this;
+    }
+
+    public function getInstructor(): ?Person
+    {
+        return $this->instructor;
+    }
+
+    public function setInstructor(?Person $instructor): self
+    {
+        $this->instructor = $instructor;
+
+        return $this;
+    }
+
+    public function sort(string $string, string $string1)
+    {
+    }
+
+    public function orderBy(string $string, string $string1)
+    {
+    }
+
+    /**
+     * @return Collection<int, Registration>
+     */
+    public function getRegistrations(): Collection
+    {
+        return $this->registrations;
+    }
+
+    public function addRegistration(Registration $registration): self
+    {
+        if (!$this->registrations->contains($registration)) {
+            $this->registrations->add($registration);
+            $registration->setLesson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistration(Registration $registration): self
+    {
+        if ($this->registrations->removeElement($registration)) {
+            // set the owning side to null (unless already changed)
+            if ($registration->getLesson() === $this) {
+                $registration->setLesson(null);
+            }
+        }
 
         return $this;
     }

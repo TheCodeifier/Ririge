@@ -24,9 +24,10 @@
                     <td>{{ training.name }}</td>
                     <td>{{ training.description }}</td>
                     <td>{{ training.duration }}</td>
-                    <td>{{ training.extracosts }}€</td>
+                    <td>
+                        {{ training.extracosts }}€</td>
 
-                    <td><a class="btn btn-warning" href="#">Albert</a></td>
+                    <td><a class="btn btn-warning" href="/adminstration/training/update/{{ training.id }}">Albert</a></td>
                     <td><a class="btn btn-danger" href="/adminstration/delete/training/{{ training.id }}">Hein</a></td>
                 </tr>
             {% endfor %}

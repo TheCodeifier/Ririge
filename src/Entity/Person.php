@@ -7,9 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: PersonRepository::class)]
-class Person implements \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
+#[UniqueEntity(fields: "username",message: "There is already an account with this user name")]
+class Person implements UserInterface,
+    PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,7 +22,7 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $loginname = null;
+    private ?string $username = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -25,7 +30,7 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
     #[ORM\Column(length: 255)]
     private ?string $firstname = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $preprovision = null;
 
     #[ORM\Column(length: 255)]
@@ -34,8 +39,7 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateofbirth = null;
 
-    #[ORM\OneToMany(mappedBy: 'Person', targetEntity: PersonLesson::class)]
-    private Collection $personLessons;
+
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $hiring_date = null;
@@ -46,21 +50,29 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
     #[ORM\Column(nullable: true)]
     private ?int $social_sec_number = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255,)]
     private ?string $street = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255,)]
     private ?string $place = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $role = null;
+    #[ORM\Column(type: 'json')]
+    private $roles=[];
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    #[ORM\OneToMany(mappedBy: 'instructor', targetEntity: Lesson::class)]
+    private Collection $lessons;
+
+    #[ORM\OneToMany(mappedBy: 'member', targetEntity: Registration::class)]
+    private Collection $registrations;
+
     public function __construct()
     {
         $this->personLessons = new ArrayCollection();
+        $this->lessons = new ArrayCollection();
+        $this->registrations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -68,18 +80,21 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
         return $this->id;
     }
 
-    public function getLoginname(): ?string
+    public function getUsername(): ?string
     {
-        return $this->loginname;
+        return $this->username;
     }
 
-    public function setLoginname(string $loginname): self
+    public function setUsername(string $username): self
     {
-        $this->loginname = $loginname;
+        $this->username = $username;
 
         return $this;
     }
 
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -90,6 +105,14 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
         $this->password = $password;
 
         return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getSalt(): ?string
+    {
+        return null;
     }
 
     public function getFirstname(): ?string
@@ -140,35 +163,7 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
         return $this;
     }
 
-    /**
-     * @return Collection<int, PersonLesson>
-     */
-    public function getPersonLessons(): Collection
-    {
-        return $this->personLessons;
-    }
 
-    public function addPersonLesson(PersonLesson $personLesson): self
-    {
-        if (!$this->personLessons->contains($personLesson)) {
-            $this->personLessons->add($personLesson);
-            $personLesson->setPerson($this);
-        }
-
-        return $this;
-    }
-
-    public function removePersonLesson(PersonLesson $personLesson): self
-    {
-        if ($this->personLessons->removeElement($personLesson)) {
-            // set the owning side to null (unless already changed)
-            if ($personLesson->getPerson() === $this) {
-                $personLesson->setPerson(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getHiringDate(): ?\DateTimeInterface
     {
@@ -230,17 +225,7 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
         return $this;
     }
 
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
 
-    public function setRole(?string $role): self
-    {
-        $this->role = $role;
-
-        return $this;
-    }
 
     public function getEmail(): ?string
     {
@@ -250,6 +235,96 @@ class Person implements \Symfony\Component\Security\Core\User\PasswordAuthentica
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Lesson>
+     */
+    public function getLessons(): Collection
+    {
+        return $this->lessons;
+    }
+
+    public function addLesson(Lesson $lesson): self
+    {
+        if (!$this->lessons->contains($lesson)) {
+            $this->lessons->add($lesson);
+            $lesson->setInstructor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLesson(Lesson $lesson): self
+    {
+        if ($this->lessons->removeElement($lesson)) {
+            // set the owning side to null (unless already changed)
+            if ($lesson->getInstructor() === $this) {
+                $lesson->setInstructor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function eraseCredentials()
+    {
+        // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
+    public function toArray()
+    {
+    }
+
+    /**
+     * @return Collection<int, Registration>
+     */
+    public function getRegistrations(): Collection
+    {
+        return $this->registrations;
+    }
+
+    public function addRegistration(Registration $registration): self
+    {
+        if (!$this->registrations->contains($registration)) {
+            $this->registrations->add($registration);
+            $registration->setMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRegistration(Registration $registration): self
+    {
+        if ($this->registrations->removeElement($registration)) {
+            // set the owning side to null (unless already changed)
+            if ($registration->getMember() === $this) {
+                $registration->setMember(null);
+            }
+        }
 
         return $this;
     }

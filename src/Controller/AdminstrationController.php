@@ -4,21 +4,24 @@ namespace App\Controller;
 
 use App\Entity\Training;
 use App\Form\TrainingType;
+use App\Form\UserUpdateType;
 use App\Repository\LessonRepository;
 use App\Repository\PersonRepository;
 use App\Repository\TrainingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function PHPUnit\Framework\isEmpty;
 
 class AdminstrationController extends AbstractController
 {
     #[Route('/adminstration', name: 'app_adminstration')]
     public function index(PersonRepository $personRepository): Response
     {
-        $persons = $personRepository->findAll();
+        $persons = $personRepository->findUsersByRole('ROLE_USER');
         return $this->render('adminstration/overview.html.twig', [
             'controller_name' => 'AdminstrationController',
             'persons'=>$persons,
@@ -32,9 +35,10 @@ class AdminstrationController extends AbstractController
     #[Route('/adminstration/instructor', name: 'app_adminstration_instructor')]
     public function instructor(PersonRepository $personRepository): Response
     {
-        $persons = $personRepository->findBy([
-            'role'=>'["ROLE_INSTRUCTOR"]',
-        ]);
+        $persons = $personRepository->findUsersByRole('ROLE_INSTRUCTOR');
+
+
+
         return $this->render('adminstration/overview.html.twig', [
             'controller_name' => 'AdminstrationController',
             'persons'=>$persons,
@@ -44,6 +48,7 @@ class AdminstrationController extends AbstractController
             'link3'=>'',
 
         ]);
+
     }
 
     #[Route('/adminstration/training', name: 'app_adminstration_training')]
@@ -57,6 +62,47 @@ class AdminstrationController extends AbstractController
             'link1'=>'',
             'link2'=>'',
             'link3'=>' active',
+
+        ]);
+    }
+
+    #[Route('/adminstration/training/update/{id}', name: 'training_update')]
+    public function trainingUpdate(EntityManagerInterface $entityManager, Request $request, TrainingRepository $trainingRepository, int $id)
+    {
+        $training = $trainingRepository->find($id);
+        $form= $this->createForm(TrainingType::class, $training);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $training= $form->getData();
+            $entityManager->persist($training);
+            $entityManager->flush();
+            $this->addFlash('success', 'Item successfully updated');
+            return $this->redirectToRoute('app_adminstration_training');
+        }
+
+        return $this->renderForm('adminstration/trainingAdd.html.twig', [
+            'form'=>$form,
+        ]);
+    }
+
+    #[Route('/adminstration/person/update/{id}', name: 'person_update')]
+    public function personUpdate(EntityManagerInterface $entityManager, Request $request, PersonRepository $personRepository, int $id)
+    {
+        $person = $personRepository->find($id);
+        $form= $this->createForm(UserUpdateType::class, $person);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $person= $form->getData();
+            $entityManager->persist($person);
+            $entityManager->flush();
+            $this->addFlash('success', 'Item successfully updated');
+            return $this->redirectToRoute('app_adminstration');
+        }
+
+        return $this->renderForm('adminstration/userUpdate.html.twig', [
+            'form'=>$form,
         ]);
     }
 

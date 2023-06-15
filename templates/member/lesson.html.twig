@@ -1,0 +1,28 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <link rel="stylesheet" href="css/loading.css" />
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <ul>
+                <li><a href="{{ path('app_logout') }}">Logout</a></li>
+            </ul>
+
+            {% for lesson in lessons %}
+                <div class="col-md-3">
+                    <div class="card">
+                        <br>
+                        <p class="text-center"><b>{{ lesson.training.name }}</b></p>
+                        <div class="card-body">
+                            <p class="text-center">{{ lesson.date | date('l jS F') }} at {{ lesson.time | date('g a') }}</p>
+                            <p class="text-center">Duration: {{ lesson.training.duration }} minutes</p>
+                            <p class="text-center">Instructor: {{ lesson.instructor.username }}</p>
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
