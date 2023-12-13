@@ -1,20 +1,31 @@
+.vs/
+bin/
+obj/
+*.user
+artifacts/
+msbuild.binlog
+.vscode/
+*.binlog
+*.nupkg
+*.zip
 
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
-###< symfony/framework-bundle ###
+*.idea
+_ReSharper.Caches
+.DS_Store
 
-###> phpunit/phpunit ###
-/phpunit.xml
-.phpunit.result.cache
-###< phpunit/phpunit ###
+Oqtane.Server/appsettings.json
+Oqtane.Server/Data
 
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
+Oqtane.Server/Properties/PublishProfiles/FolderProfile.pubxml
+Oqtane.Server/Content
+Oqtane.Server/Packages
+Oqtane.Server/wwwroot/Content
+Oqtane.Server/wwwroot/Packages/*.log
+
+Oqtane.Server/wwwroot/Modules
+!Oqtane.Server/wwwroot/Modules/Oqtane.Modules.*
+!Oqtane.Server/wwwroot/Modules/Templates
+
+Oqtane.Server/wwwroot/Themes
+!Oqtane.Server/wwwroot/Themes/Oqtane.Themes.*
+!Oqtane.Server/wwwroot/Themes/Templates

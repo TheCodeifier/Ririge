@@ -1,1 +1,2 @@
-# if-sd-php-p08-trainingsfactory
+# Ririge
+Ririge is the first project of Diomuzan in which the CMS Oqtane is successfully installed.
